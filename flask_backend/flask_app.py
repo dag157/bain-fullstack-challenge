@@ -15,10 +15,10 @@ def places():
 
     city = request.args.get('city')
 
-    test_api_call_2 = requests.get(f'https://maps.googleapis.com/maps/api/place/autocomplete/json?input={city}&types=geocode&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
-    test_api_call_content_2 = test_api_call_2.content
+    resp = requests.get(f'https://maps.googleapis.com/maps/api/place/autocomplete/json?input={city}&types=geocode&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
+    resp_content = resp.content
 
-    res = json.loads(test_api_call_content_2, strict=False)
+    res = json.loads(resp_content, strict=False)
 
     return jsonify(res)
 
@@ -32,17 +32,17 @@ def weather():
     for place in weatherDataJson:
         place_name = place['place']
         place_id = place['place_id']
-        test_api_call_2 = requests.get(f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
-        test_api_call_content_2 = test_api_call_2.content
-        res = json.loads(test_api_call_content_2, strict=False)
+        place_resp = requests.get(f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
+        place_resp_content = place_resp.content
+        res = json.loads(place_resp_content, strict=False)
 
         longitude = res['result']['geometry']['location']['lng']
         latitude = res['result']['geometry']['location']['lat']
 
-        test_api_call_weather = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid=e3b155955e28f330270ad5fab940d12c')
-        test_api_call_weather_content = test_api_call_weather.content
+        weather_resp = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid=e3b155955e28f330270ad5fab940d12c')
+        weather_resp_content = weather_resp.content
 
-        weather_res = json.loads(test_api_call_weather_content, strict=False)
+        weather_res = json.loads(weather_resp_content, strict=False)
         
         weather_object = {
             'currentWeather': weather_res,
