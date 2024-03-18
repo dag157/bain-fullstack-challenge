@@ -20,6 +20,18 @@
         justify-content: center;
         margin-top: 5%;
     }
+
+    .centerlist {
+        display: block;
+        margin-left: 35%;
+        margin-right: 35%;
+        margin-top: 5%;
+    }
+
+    .space {
+        margin: 10px;
+        background-color: #fefbd8;
+    }
 </style>
 
 {% endblock %}
@@ -99,8 +111,9 @@
   fetchWeather = async (weatherData) => {
         try {
             // http://127.0.0.1:5000/weather?weatherData=${weatherData}
+            // http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}
             const res = await fetch(
-                `http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}`
+                `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -112,8 +125,9 @@
     fetchPlace = async (text) => {
         try {
             // http://127.0.0.1:5000/places?city=${text}
+            // http://domgurnari.pythonanywhere.com/places?city=${text}
             const res = await fetch(
-                `http://domgurnari.pythonanywhere.com/places?city=${text}`
+                `http://127.0.0.1:5000/places?city=${text}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -128,7 +142,7 @@
     <form action="{{ url_for('weather') }}" method="post" name="regform" id="regform">
       <div className="center">
         <div className="placesAutocomplete__inputWrap">
-          <div>
+          <div className="center">
             Enter a city (Example: Paris)
             </div>
           <label htmlFor="city" className="label">
@@ -174,14 +188,14 @@
       </div>
     </form>
 
-    <div className="center">
+    <ol className="centerlist">
         {this.state.selectedCities.map((city) => (
-                <div>
+                <li>
                <div>{city.place}</div>
                <button onClick={() => this.handleRemoveFromSelectedCities(city.place, city.place_id)}>Remove</button>
-               </div>
+               </li>
             ))}
-    </div>
+    </ol>
 
     <div className="center">
         <button onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
@@ -189,10 +203,10 @@
 
     <div className="center">
         {this.state.weatherResponses && this.state.weatherResponses.map((weatherResponse) => (
-            <div>
+            <div className="space">
                 <div>{weatherResponse.place_name}</div>
-                <div>Latitude: {weatherResponse.latitude}</div>
-                <div>Longitude: {weatherResponse.longitude}</div>
+                <div>Latitude: {(weatherResponse.latitude).toFixed(2)}</div>
+                <div>Longitude: {(weatherResponse.longitude).toFixed(2)}</div>
 
                 <div>
                     <img 
@@ -203,10 +217,10 @@
 
                 <div>{weatherResponse['currentWeather']['weather'][0]['description']}</div>
 
-                <div>Temperature: {weatherResponse['currentWeather']['main']['temp']-273.15} C</div>
-                <div>Feels Like: {weatherResponse['currentWeather']['main']['feels_like']-273.15} C</div>
-                <div>Temperature Min: {weatherResponse['currentWeather']['main']['temp_max']-273.15} C</div>
-                <div>Temperature Max: {weatherResponse['currentWeather']['main']['temp_min']-273.15} C</div>
+                <div>Temperature: {(weatherResponse['currentWeather']['main']['temp']-273.15).toFixed(2)} C</div>
+                <div>Feels Like: {(weatherResponse['currentWeather']['main']['feels_like']-273.15).toFixed(2)} C</div>
+                <div>Temperature Min: {(weatherResponse['currentWeather']['main']['temp_max']-273.15).toFixed(2)} C</div>
+                <div>Temperature Max: {(weatherResponse['currentWeather']['main']['temp_min']-273.15).toFixed(2)} C</div>
                 <div>Humidity: {weatherResponse['currentWeather']['main']['humidity']}</div>
                 <div>Pressure: {weatherResponse['currentWeather']['main']['pressure']}</div>
             </div>
