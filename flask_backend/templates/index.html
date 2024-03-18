@@ -1,8 +1,258 @@
 <html>
+{% block title %}{% endblock %}
+{% block head %}
 
-<h1>Hello</h1>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>React Local</title>
+<!-- Import the React, React-Dom and Babel libraries from unpkg -->
+  <script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+  <script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
+  <script type="application/javascript" src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
 
-{% if error %}<div class="error"><strong>Error:</strong> {{ error }}</div>{% endif %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script>
+        </script>
+
+
+{% endblock %}
+{% block body %}
+
+<div id="root"></div>
+
+<script type="text/babel">
+// Obtain the root 
+    const rootElement = document.getElementById('root')
+// Create a ES6 class component    
+    class ShoppingList extends React.Component { 
+
+    constructor(props) {
+        super(props);
+        this.state = {
+
+              data: 'nothing',
+              city: "",
+              autocompleteCities: [],
+              autocompleteErr: "",
+              selectedCities: [],
+              selectedCitiesSet: new Set(),
+              weatherResponses: [],
+          
+        };
+       
+    }
+
+    
+
+  handleCityChange = async (e) => {
+    e.persist();
+    this.setState({city: e.target.value});
+    if (!this.state.city) return;
+
+    const res = await this.fetchPlace(this.state.city);
+    console.log(this.state.autocompleteCities);
+    !this.state.autocompleteCities.includes(e.target.value) &&
+      res.predictions &&
+      this.setState({autocompleteCities: res.predictions.map((place) => place)})
+    res.error ? this.setState({autocompleteErr: res.error}) : this.setState({autocompleteErr: ""});
+  };
+
+  handleChangeSelectedCity = async (e) => {
+    e.persist();
+
+    var options = e.target.options;
+    var value = [];
+    for (var i = 0, l = options.length; i < l; i++) {
+        if (options[i].selected) {
+            value.push(options[i].value);
+
+            const selectedCity = JSON.parse(options[i].value);
+
+            if (!this.state.selectedCitiesSet.has(selectedCity.place_id))
+            {
+                this.state.selectedCities.push(selectedCity);
+                this.state.selectedCitiesSet.add(selectedCity.place_id);
+            }
+        }
+    }
+
+    this.setState({selectedCities: this.state.selectedCities});
+    this.setState({selectedCitiesSet: this.state.selectedCitiesSet});
+
+  };
+
+    handleClick() {
+        const xhr = new XMLHttpRequest();
+        
+        xhr.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=Paris&types=geocode&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU');
+        xhr.setRequestHeader("Access-Control-Allow-Origin", "https://maps.googleapis.com");
+        xhr.onload = function() {
+            console.log(xhr.status)
+            if (xhr.status === 200) {
+                this.setState({data: JSON.parse(xhr.responseText)});
+            }
+        };
+        xhr.send();
+    }
+
+    handleRemoveFromSelectedCities = async (e, id) => {
+        const newSelectedCities = this.state.selectedCities.filter((city) => city.place_id !== id);
+        this.state.selectedCitiesSet.delete(id);
+        this.setState({selectedCities: newSelectedCities});
+        this.setState({selectedCitiesSet: this.state.selectedCitiesSet});
+
+  };
+
+  handleGetWeather = async () => {
+        const weatherData = JSON.stringify(this.state.selectedCities);
+        const res = await this.fetchWeather(weatherData);
+        this.setState({weatherResponses: res});
+  };
+
+  fetchWeather = async (weatherData) => {
+        try {
+            const res = await fetch(
+            `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
+            );
+            if (!res.ok) throw new Error(res.statusText);
+            return res.json();
+        } catch (err) {
+            return { error: "Unable to retrieve places" };
+        }
+    };
+
+    fetchPlace = async (text) => {
+        try {
+            const res = await fetch(
+            `http://127.0.0.1:5000/places?city=${text}`
+            );
+            if (!res.ok) throw new Error(res.statusText);
+            return res.json();
+        } catch (err) {
+            return { error: "Unable to retrieve places" };
+        }
+    };
+
+    render() { 
+        return (
+        <div>
+        
+
+
+    <form action="{{ url_for('weather') }}" method="post" name="regform" id="regform">
+      <div className="placesAutocomplete">
+        <div className="placesAutocomplete__inputWrap">
+          <label htmlFor="city" className="label">
+            Your city
+            {this.state.autocompleteErr && (
+              <span className="inputError">{this.state.autocompleteErr}</span>
+            )}
+          </label>
+          <input
+            list="places"
+            type="text"
+            id="city"
+            name="city"
+            onChange={this.handleCityChange}
+            value={this.state.city}
+            required
+            pattern={this.state.autocompleteCities.map((place) => place.description).join("|")}
+            autoComplete="off"
+          />
+          <input
+            list="places"
+            type="hidden"
+            id="placeid"
+            name="place"
+            value={this.state.city}
+            required
+            pattern={this.state.autocompleteCities.map((place) => place.description).join("|")}
+            autoComplete="off"
+          />
+          
+          <select
+            multiple={true}
+            onChange={this.handleChangeSelectedCity}
+            value={this.state.city}
+        >
+        {this.state.autocompleteCities.map((city, i) => (
+               <option key={i} value={`{"place": "${city.description}", "place_id":"${city.place_id}"}`}>{city.description}</option>
+            ))}
+        </select>
+          <span className="placesAutocomplete__hint">
+            *start typing and choose your city from the given options
+          </span>
+        </div>
+      </div>
+    </form>
+
+    <div>
+        {this.state.selectedCities.map((city) => (
+                <div>
+               <div>{city.place}</div>
+               <button onClick={() => this.handleRemoveFromSelectedCities(city.place, city.place_id)}>Remove</button>
+               </div>
+            ))}
+    </div>
+
+    <button onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
+
+    <div>
+        {this.state.weatherResponses && this.state.weatherResponses.map((weatherResponse) => (
+            <div>
+                <div>{weatherResponse.place_name}</div>
+                <div>Latitude: {weatherResponse.latitude}</div>
+                <div>Longitude: {weatherResponse.longitude}</div>
+
+                <div>
+                    <img 
+                        src={`http://openweathermap.org/img/wn/${weatherResponse['currentWeather']['weather'][0]['icon']}.png`}
+                        alt="new"
+                    />
+                </div>
+
+                <div>{weatherResponse['currentWeather']['weather'][0]['description']}</div>
+
+                <div>Temperature: {weatherResponse['currentWeather']['main']['temp']-273.15} C</div>
+                <div>Feels Like: {weatherResponse['currentWeather']['main']['feels_like']-273.15} C</div>
+                <div>Temperature Min: {weatherResponse['currentWeather']['main']['temp_max']-273.15} C</div>
+                <div>Temperature Max: {weatherResponse['currentWeather']['main']['temp_min']-273.15} C</div>
+                <div>Humidity: {weatherResponse['currentWeather']['main']['humidity']}</div>
+                <div>Pressure: {weatherResponse['currentWeather']['main']['pressure']}</div>
+            </div>
+            ))}
+    </div>
+
+    
+</div>
+        
+      );
+      } 
+    }
+// Create a function to wrap up your component
+function App(){
+  return(
+  <div>
+    <ShoppingList name="@luispagarcia on Dev.to!"/>
+  </div>
+  )
+}
+
+
+// Use the ReactDOM.render to show your component on the browser
+    ReactDOM.render(
+      <App />,
+      rootElement
+    )
+</script>
+
+  <!-- REGISTRATION PAGE-->
+
+  
+  
+  
+{% endblock %}
 
 
 </html>
