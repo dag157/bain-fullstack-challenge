@@ -33,22 +33,18 @@
 // Obtain the root 
     const rootElement = document.getElementById('root')
 // Create a ES6 class component    
-    class ShoppingList extends React.Component { 
+    class WeatherApp extends React.Component { 
 
     constructor(props) {
         super(props);
         this.state = {
-
-              data: 'nothing',
               city: "",
               autocompleteCities: [],
               autocompleteErr: "",
               selectedCities: [],
               selectedCitiesSet: new Set(),
               weatherResponses: [],
-          
         };
-       
     }
 
     
@@ -59,7 +55,7 @@
     if (!this.state.city) return;
 
     const res = await this.fetchPlace(this.state.city);
-    console.log(this.state.autocompleteCities);
+
     !this.state.autocompleteCities.includes(e.target.value) &&
       res.predictions &&
       this.setState({autocompleteCities: res.predictions.map((place) => place)})
@@ -87,20 +83,6 @@
     this.setState({selectedCitiesSet: this.state.selectedCitiesSet});
 
   };
-
-    handleClick() {
-        const xhr = new XMLHttpRequest();
-        
-        xhr.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=Paris&types=geocode&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU');
-        xhr.setRequestHeader("Access-Control-Allow-Origin", "https://maps.googleapis.com");
-        xhr.onload = function() {
-            console.log(xhr.status)
-            if (xhr.status === 200) {
-                this.setState({data: JSON.parse(xhr.responseText)});
-            }
-        };
-        xhr.send();
-    }
 
     handleRemoveFromSelectedCities = async (e, id) => {
         const newSelectedCities = this.state.selectedCities.filter((city) => city.place_id !== id);
@@ -246,7 +228,7 @@
 function App(){
   return(
   <div>
-    <ShoppingList name="@luispagarcia on Dev.to!"/>
+    <WeatherApp />
   </div>
   )
 }
@@ -259,10 +241,6 @@ function App(){
     )
 </script>
 
-  <!-- REGISTRATION PAGE-->
-
-  
-  
   
 {% endblock %}
 
