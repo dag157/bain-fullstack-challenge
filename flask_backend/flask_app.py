@@ -29,9 +29,14 @@ def weather():
     weatherData = request.args.get('weatherData')
     weatherDataJson = json.loads(weatherData)
 
+    print(weatherData)
+
     for place in weatherDataJson:
         place_name = place['place']
         place_id = place['place_id']
+        time = ''
+        if 'historicalDataDate' in place:
+            time = place['historicalDataDate']
         place_resp = requests.get(f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
         place_resp_content = place_resp.content
         res = json.loads(place_resp_content, strict=False)
@@ -43,14 +48,26 @@ def weather():
         weather_resp_content = weather_resp.content
 
         weather_res = json.loads(weather_resp_content, strict=False)
+
+        if time != '':
+            historical_weather_res = []
+            # historical_weather_resp = requests.get(f'https://api.openweathermap.org/data/3.0/onecall/timemachine?lat={latitude}&lon={longitude}&dt={time}&appid=72f82116224a0c24dd6370778714533d')
+            # historical_weather_resp_content = historical_weather_resp.content
+
+            # historical_weather_res = json.loads(historical_weather_resp_content, strict=False)
+        else:
+            historical_weather_res = []
         
         weather_object = {
             'currentWeather': weather_res,
             'longitude': longitude,
             'latitude': latitude,
             'place_name': place_name,
-            'place_id': place_id
+            'place_id': place_id,
+            'historical_data': historical_weather_res
         }
+
+        print(weather_object)
         
         weather_stats_to_return.append(weather_object)
 
