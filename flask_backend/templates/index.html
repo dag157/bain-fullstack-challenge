@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>React Local</title>
+  <title>Weather App</title>
 <!-- Import the React, React-Dom and Babel libraries from unpkg -->
   <script type="application/javascript" src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
   <script type="application/javascript" src="https://unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js"></script>
@@ -15,6 +15,14 @@
         <script>
         </script>
 
+<style>
+    .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 5%;
+    }
+</style>
 
 {% endblock %}
 {% block body %}
@@ -61,11 +69,9 @@
   handleChangeSelectedCity = async (e) => {
     e.persist();
 
-    var options = e.target.options;
-    var value = [];
-    for (var i = 0, l = options.length; i < l; i++) {
+    const options = e.target.options;
+    for (let i = 0, l = options.length; i < l; i++) {
         if (options[i].selected) {
-            value.push(options[i].value);
 
             const selectedCity = JSON.parse(options[i].value);
 
@@ -113,7 +119,7 @@
   fetchWeather = async (weatherData) => {
         try {
             const res = await fetch(
-            `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
+                `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -125,7 +131,7 @@
     fetchPlace = async (text) => {
         try {
             const res = await fetch(
-            `http://127.0.0.1:5000/places?city=${text}`
+                `http://127.0.0.1:5000/places?city=${text}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -141,10 +147,12 @@
 
 
     <form action="{{ url_for('weather') }}" method="post" name="regform" id="regform">
-      <div className="placesAutocomplete">
+      <div className="center">
         <div className="placesAutocomplete__inputWrap">
+          <div>
+            Enter a city (Example: Paris)
+            </div>
           <label htmlFor="city" className="label">
-            Your city
             {this.state.autocompleteErr && (
               <span className="inputError">{this.state.autocompleteErr}</span>
             )}
@@ -170,24 +178,24 @@
             pattern={this.state.autocompleteCities.map((place) => place.description).join("|")}
             autoComplete="off"
           />
-          
+          <br />
           <select
             multiple={true}
             onChange={this.handleChangeSelectedCity}
             value={this.state.city}
-        >
+         >
         {this.state.autocompleteCities.map((city, i) => (
                <option key={i} value={`{"place": "${city.description}", "place_id":"${city.place_id}"}`}>{city.description}</option>
             ))}
         </select>
           <span className="placesAutocomplete__hint">
-            *start typing and choose your city from the given options
+
           </span>
         </div>
       </div>
     </form>
 
-    <div>
+    <div className="center">
         {this.state.selectedCities.map((city) => (
                 <div>
                <div>{city.place}</div>
@@ -196,9 +204,11 @@
             ))}
     </div>
 
-    <button onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
+    <div className="center">
+        <button onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
+    </div>
 
-    <div>
+    <div className="center">
         {this.state.weatherResponses && this.state.weatherResponses.map((weatherResponse) => (
             <div>
                 <div>{weatherResponse.place_name}</div>
