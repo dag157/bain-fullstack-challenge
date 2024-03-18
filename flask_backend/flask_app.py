@@ -29,14 +29,14 @@ def weather():
     weatherData = request.args.get('weatherData')
     weatherDataJson = json.loads(weatherData)
 
-    print(weatherData)
-
     for place in weatherDataJson:
         place_name = place['place']
         place_id = place['place_id']
         time = ''
+        timeend = ''
         if 'historicalDataDate' in place:
             time = place['historicalDataDate']
+            timeend = place['historicalDataDateEnd']
         place_resp = requests.get(f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
         place_resp_content = place_resp.content
         res = json.loads(place_resp_content, strict=False)
@@ -49,12 +49,14 @@ def weather():
 
         weather_res = json.loads(weather_resp_content, strict=False)
 
-        if time != '':
+        if time != '' and timeend != '':
+            daterange = compute_date_range(time, timeend)
             historical_weather_res = []
-            # historical_weather_resp = requests.get(f'https://api.openweathermap.org/data/3.0/onecall/timemachine?lat={latitude}&lon={longitude}&dt={time}&appid=72f82116224a0c24dd6370778714533d')
-            # historical_weather_resp_content = historical_weather_resp.content
-
-            # historical_weather_res = json.loads(historical_weather_resp_content, strict=False)
+            for date in daterange:
+                historical_weather_resp = requests.get(f'https://api.openweathermap.org/data/3.0/onecall/timemachine?lat={latitude}&lon={longitude}&dt={date}&appid=72f82116224a0c24dd6370778714533d')
+                historical_weather_resp_content = historical_weather_resp.content
+                historical_weather_res.append(json.loads(historical_weather_resp_content, strict=False))
+            # historical_weather_res
         else:
             historical_weather_res = []
         
@@ -72,3 +74,19 @@ def weather():
         weather_stats_to_return.append(weather_object)
 
     return jsonify(weather_stats_to_return)
+
+def compute_date_range(startTime, endTime):
+    ranges = []
+    startTime = int(startTime)
+    endTime = int(endTime)
+    ranges.append(str(startTime))
+
+    counter = startTime
+    while counter < endTime:
+        counter += 86400
+        if counter < endTime:
+            ranges.append(str(counter))
+    
+    ranges.append(str(endTime))
+
+    return ranges

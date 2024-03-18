@@ -15,16 +15,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 
-  <script>
-        // $(function() {
-        //   $("#datepicker").datepicker({
-        //     onSelect: function() { 
-        //         const dateObject = $(this).datepicker('getDate'); 
-        //         console.log(dateObject);
-        //     }
-        //   });
-        // });
-  </script>
+
 
 
 
@@ -69,6 +60,8 @@
               selectedCities: [],
               selectedCitiesSet: new Set(),
               weatherResponses: [],
+              shouldShowJSON: false,
+              shouldShowHistoricalData: false,
         };
     }
 
@@ -82,6 +75,18 @@
                     const unixTimestamp = Math.floor(dateObject.getTime() / 1000);
                     this.dateTimestamp = unixTimestamp;
                     localStorage.setItem("datetimestamp", this.dateTimestamp);
+                }
+            });
+        });
+
+        $(function() {
+            $("#datepickerend").datepicker({
+                onSelect: function() {
+                    this.dateTimestampend = localStorage.getItem("datetimestampend");
+                    const dateObject = $(this).datepicker('getDate'); 
+                    const unixTimestamp = Math.floor(dateObject.getTime() / 1000);
+                    this.dateTimestampend = unixTimestamp;
+                    localStorage.setItem("dateTimestampend", this.dateTimestampend);
                 }
             });
         });
@@ -133,8 +138,9 @@
   createWeatherWithDate = (selectedCities) => {
         const weatherDataCities = selectedCities;
         for (let i = 0; i < weatherDataCities.length; i++) {
-            // console.log(selectedCities);
             weatherDataCities[i]['historicalDataDate'] = localStorage.getItem("datetimestamp");
+            const endTime = localStorage.getItem("dateTimestampend");
+            weatherDataCities[i]['historicalDataDateEnd'] = endTime;
         }
         return weatherDataCities;
   };
@@ -144,6 +150,14 @@
         const weatherData = JSON.stringify(weatherDataWithDate);
         const res = await this.fetchWeather(weatherData);
         this.setState({weatherResponses: res});
+  };
+
+  toggleShowHistoricalData = async () => {
+        this.setState({shouldShowHistoricalData: !this.state.shouldShowHistoricalData});
+  };
+
+  toggleShowJSON = async () => {
+        this.setState({shouldShowJSON: !this.state.shouldShowJSON});
   };
 
   fetchWeather = async (weatherData) => {
@@ -236,7 +250,9 @@
     </ol>
 
 
-    <div className="center">Get Historial Data until date: <input onSelect={this.handleDateChange} type="text" id="datepicker" /></div>
+    <div className="center">Get Historial Data</div>
+    <div className="center">Start Date: <input onSelect={this.handleDateChange} type="text" id="datepicker" /></div>
+    <div className="center">End Date: <input onSelect={this.handleDateChange} type="text" id="datepickerend" /></div>
 
     <div className="center">
         <button onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
@@ -246,6 +262,8 @@
         {this.state.weatherResponses && this.state.weatherResponses.map((weatherResponse) => (
             <div className="space">
                 <b>{weatherResponse.place_name}</b>
+                <br />
+                <div>Today</div>
                 <br />
                 <div>Latitude: {(weatherResponse.latitude).toFixed(2)}</div>
                 <div>Longitude: {(weatherResponse.longitude).toFixed(2)}</div>
@@ -265,6 +283,35 @@
                 <div>Temperature Max: {(weatherResponse['currentWeather']['main']['temp_min']-273.15).toFixed(2)} C</div>
                 <div>Humidity: {weatherResponse['currentWeather']['main']['humidity']}</div>
                 <div>Pressure: {weatherResponse['currentWeather']['main']['pressure']}</div>
+
+                <br />
+                <button onClick={() => this.toggleShowHistoricalData()}>Toggle Show Historical Data</button>
+                {this.state.shouldShowHistoricalData  && weatherResponse['historical_data'].map((historical) => (
+                    <div>
+                    <b>Date: {(new Date(historical['data'][0]['dt'] * 1000)).toLocaleDateString(undefined, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</b>
+                    <div>
+                        <img 
+                            src={`http://openweathermap.org/img/wn/${historical['data'][0]['weather'][0]['icon']}.png`}
+                            alt="new"
+                        />
+                    </div>
+                    <div></div>
+                    <div>{historical['data'][0]['weather'][0]['description']}</div>
+                    <div>Temperature: {(historical['data'][0]['temp']-273.15).toFixed(2)} C</div>
+                    <div>Feels Like: {(historical['data'][0]['feels_like']-273.15).toFixed(2)} C</div>
+                    <div>Humidity: {historical['data'][0]['humidity']}</div>
+                    <div>Pressure: {historical['data'][0]['pressure']}</div>
+                    </div>
+                ))}
+
+                
+
+                <button onClick={() => this.toggleShowJSON()}>Toggle Show JSON</button>
+                {this.state.shouldShowJSON && 
+                    <div>{JSON.stringify(weatherResponse)}</div>
+                }
+
+
             </div>
             ))}
     </div>
