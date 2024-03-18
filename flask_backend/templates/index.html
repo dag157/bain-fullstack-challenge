@@ -118,8 +118,9 @@
 
   fetchWeather = async (weatherData) => {
         try {
+            // http://127.0.0.1:5000/weather?weatherData=${weatherData}
             const res = await fetch(
-                `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
+                `http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -130,8 +131,9 @@
 
     fetchPlace = async (text) => {
         try {
+            // http://127.0.0.1:5000/places?city=${text}
             const res = await fetch(
-                `http://127.0.0.1:5000/places?city=${text}`
+                `http://domgurnari.pythonanywhere.com/places?city=${text}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
