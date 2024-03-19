@@ -228,7 +228,7 @@
             localStorage.getItem("dateTimestampend") != undefined && localStorage.getItem("datetimestamp") != undefined &&
             Number(localStorage.getItem("dateTimestampend")) < Number(localStorage.getItem("datetimestamp"))
         ) {
-            alert('Enter valid date rangem1');
+            alert('Please enter a valid date range');
             return;
         }
 
@@ -236,7 +236,14 @@
             (localStorage.getItem("dateTimestampend") == undefined && localStorage.getItem("datetimestamp") != undefined) ||
             (localStorage.getItem("dateTimestampend") != undefined && localStorage.getItem("datetimestamp") == undefined)
         ) {
-            alert('Enter valid date range2');
+            alert('Please enter a to and from date');
+            return;
+        }
+
+        if (
+            this.state.selectedCities.length < 1
+        ) {
+            alert('Please enter at least one place');
             return;
         }
 
