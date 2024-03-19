@@ -41,6 +41,9 @@
         margin-left: 35%;
         margin-right: 35%;
         margin-top: 5%;
+        border: #1abc9c;
+        border-radius: 25px;
+        border: 2px solid #1abc9c;
     }
 
     .space {
@@ -98,6 +101,28 @@
         font-size: 16px;
         margin: 4px 2px;
         cursor: pointer;
+        border-radius: 25px;
+    }
+
+    .locations {
+        border: #1abc9c;
+        border: 2px solid #73AD21;
+        border-radius: 25px;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(359deg); }
+    }
+
+    .loader {
+        margin-top: 5%;
+        border: 10px solid #f3f3f3;
+        border-top: 10px solid #3498db;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 3s linear infinite;
     }
 
     .close-btn {
@@ -137,6 +162,7 @@
               weatherResponses: [],
               shouldShowJSON: false,
               shouldShowHistoricalData: false,
+              loading: false,
         };
     }
 
@@ -302,9 +328,11 @@
         try {
             // http://127.0.0.1:5000/weather?weatherData=${weatherData}
             // http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}
+            this.setState({loading: true});
             const res = await fetch(
                 `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
             );
+            this.setState({loading: false});
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
         } catch (err) {
@@ -389,19 +417,27 @@
     </div>
     </form>
 
-    <ol className="centerlist">
-        {this.state.selectedCities.map((city) => (
-                <li>
-               <div>{city.place}
-               <button className="close-btn" onClick={() => this.handleRemoveFromSelectedCities(city.place, city.place_id)}>&times;</button>
-            </div>
-               </li>
-            ))}
-    </ol>
+    {this.state.selectedCities.length > 0 &&
+        <ul className="centerlist">
+            {this.state.selectedCities.map((city) => (
+                    <li>
+                <div>{city.place}
+                <button className="close-btn" onClick={() => this.handleRemoveFromSelectedCities(city.place, city.place_id)}>&times;</button>
+                </div>
+                </li>
+                ))}
+        </ul>
+    }
 
     <div className="center">
         <button className="buttonstyle" onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
     </div>
+
+    {this.state.loading === true &&
+            <div className="center_no_space">
+                <div className="loader"></div>
+            </div>
+        }
 
     {this.state.weatherResponses.length > 0 &&
             <div className="center">
