@@ -144,6 +144,7 @@
     // Jquery here $(...)...
         $(function() {
             $("#datepicker").datepicker({
+                maxDate: new Date(),
                 onSelect: function() { 
                     this.dateTimestamp = localStorage.getItem("datetimestamp");
                     const dateObject = $(this).datepicker('getDate'); 
@@ -156,6 +157,7 @@
 
         $(function() {
             $("#datepickerend").datepicker({
+                maxDate: new Date(),
                 onSelect: function() {
                     this.dateTimestampend = localStorage.getItem("datetimestampend");
                     const dateObject = $(this).datepicker('getDate'); 
@@ -221,6 +223,23 @@
   };
 
   handleGetWeather = async () => {
+
+        if (
+            localStorage.getItem("dateTimestampend") != undefined && localStorage.getItem("datetimestamp") != undefined &&
+            Number(localStorage.getItem("dateTimestampend")) < Number(localStorage.getItem("datetimestamp"))
+        ) {
+            alert('Enter valid date rangem1');
+            return;
+        }
+
+        if (
+            (localStorage.getItem("dateTimestampend") == undefined && localStorage.getItem("datetimestamp") != undefined) ||
+            (localStorage.getItem("dateTimestampend") != undefined && localStorage.getItem("datetimestamp") == undefined)
+        ) {
+            alert('Enter valid date range2');
+            return;
+        }
+
         const weatherDataWithDate = this.createWeatherWithDate(this.state.selectedCities);
         const weatherData = JSON.stringify(weatherDataWithDate);
         const res = await this.fetchWeather(weatherData);
@@ -313,9 +332,6 @@
           <div className="center">
             </div>
           <label htmlFor="city" className="label">
-            {this.state.autocompleteErr && (
-              <span className="inputError">{this.state.autocompleteErr}</span>
-            )}
           </label>
           <input
             list="places"

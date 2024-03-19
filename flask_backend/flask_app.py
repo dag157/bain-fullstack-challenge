@@ -34,11 +34,14 @@ def weather():
     for place in weatherDataJson:
         place_name = place['place']
         place_id = place['place_id']
-        time = ''
-        timeend = ''
+        time = None
+        timeend = None
         if 'historicalDataDate' in place:
             time = place['historicalDataDate']
+
+        if 'historicalDataDateEnd' in place:
             timeend = place['historicalDataDateEnd']
+
         place_resp = requests.get(f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
         place_resp_content = place_resp.content
         res = json.loads(place_resp_content, strict=False)
@@ -51,7 +54,7 @@ def weather():
 
         weather_res = json.loads(weather_resp_content, strict=False)
 
-        if time != '' and timeend != '':
+        if time != None and timeend != None:
             daterange = compute_date_range(time, timeend)
             historical_weather_res = []
             for date in daterange:
@@ -86,8 +89,8 @@ def excel():
     for place in weatherDataJson:
         place_name = place['place']
         place_id = place['place_id']
-        time = ''
-        timeend = ''
+        time = None
+        timeend = None
         if 'historicalDataDate' in place:
             time = place['historicalDataDate']
 
@@ -106,7 +109,7 @@ def excel():
 
         weather_res = json.loads(weather_resp_content, strict=False)
 
-        if time != '' and timeend != '':
+        if time != None and timeend != None:
             daterange = compute_date_range(time, timeend)
             historical_weather_res = []
             for date in daterange:
