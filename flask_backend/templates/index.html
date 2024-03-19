@@ -43,6 +43,18 @@
         width: 300px;
         background-color: #fecbc8;
     }
+
+    .searchbox {
+        width: 500px;
+        min-width: 500px;
+        max-width: 500px;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 </style>
 
 {% endblock %}
@@ -176,7 +188,7 @@
             // http://127.0.0.1:5000/download?weatherData=${weatherData}
             // http://domgurnari.pythonanywhere.com/download?weatherData=${weatherData}
             const res = await fetch(
-                `http://domgurnari.pythonanywhere.com/download?weatherData=${weatherData}`
+                `http://127.0.0.1:5000/download?weatherData=${weatherData}`
             ).then(resp => resp.status === 200 ? resp.blob() : Promise.reject('something went wrong'))
             .then(blob => {
                 const url = window.URL.createObjectURL(blob);
@@ -207,7 +219,7 @@
             // http://127.0.0.1:5000/weather?weatherData=${weatherData}
             // http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}
             const res = await fetch(
-                `http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}`
+                `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -221,7 +233,7 @@
             // http://127.0.0.1:5000/places?city=${text}
             // http://domgurnari.pythonanywhere.com/places?city=${text}
             const res = await fetch(
-                `http://domgurnari.pythonanywhere.com/places?city=${text}`
+                `http://127.0.0.1:5000/places?city=${text}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -254,6 +266,7 @@
             required
             pattern={this.state.autocompleteCities.map((place) => place.description).join("|")}
             autoComplete="off"
+            className="searchbox"
           />
           <input
             list="places"
@@ -266,15 +279,18 @@
             autoComplete="off"
           />
           <br />
-          <select
-            multiple={true}
-            onChange={this.handleChangeSelectedCity}
-            value={this.state.city}
-         >
+          {this.state.city &&
+            <select
+                multiple={true}
+                onChange={this.handleChangeSelectedCity}
+                value={this.state.city}
+                className="searchbox"
+            >
         {this.state.autocompleteCities.map((city, i) => (
                <option key={i} value={`{"place": "${city.description}", "place_id":"${city.place_id}"}`}>{city.description}</option>
             ))}
         </select>
+        }
           <span className="placesAutocomplete__hint">
 
           </span>
