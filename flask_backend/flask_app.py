@@ -90,7 +90,10 @@ def excel():
         timeend = ''
         if 'historicalDataDate' in place:
             time = place['historicalDataDate']
+
+        if 'historicalDataDateEnd' in place:
             timeend = place['historicalDataDateEnd']
+
         place_resp = requests.get(f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key=AIzaSyDdDSkPxQJETsjJGeQ8NkzTF31t-xw6BzU')
         place_resp_content = place_resp.content
         res = json.loads(place_resp_content, strict=False)
@@ -128,7 +131,7 @@ def excel():
 
     header = ['place_name', 'currentWeather', 'longitude', 'latitude', 'place_id', 'historical_data']
     path = os.getcwd()
-    with open(f'{path}/weatherdata.xlsx', 'w') as output:
+    with open(f'{path}/weatherdata.csv', 'w') as output:
         w = csv.DictWriter(output, header)
         w.writeheader()
         for weather_stats in weather_stats_to_return:
@@ -137,7 +140,7 @@ def excel():
     print('sending file')
     path = os.getcwd()
     print(path)
-    result = send_file(f'{path}/weatherdata.xlsx', attachment_filename="test.xlsx", as_attachment=True)
+    result = send_file(f'{path}/weatherdata.csv', attachment_filename="weatherdata.csv", as_attachment=True)
 
     print('deleting file')
     return result
