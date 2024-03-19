@@ -29,6 +29,10 @@
         font-size: 30px;
     }
 
+    .textforresults {
+        color: white;
+    }
+
     .center {
         display: flex;
         align-items: center;
@@ -48,12 +52,16 @@
 
     .space {
         margin: 10px;
-        background-color: #fefbd8;
+        background-color: rgb(200, 250, 221);
+        border-radius: 5px;
     }
 
     .jsonblock {
         width: 300px;
-        background-color: #fecbc8;
+        background-color: #ffffff;
+        white-space: pre-wrap;
+        display: block;
+        word-wrap: break-word;
     }
 
     .searchbox {
@@ -104,6 +112,30 @@
         border-radius: 25px;
     }
 
+    .buttonstyle:hover {
+        background-color: #016d57;
+        color: #ffffff;
+    }
+
+    .buttonstylewhite {
+        background-color: #016d57;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 25px;
+    }
+
+    .buttonstylewhite:hover {
+        background-color: #012921;
+        color: #ffffff;
+    }
+
     .locations {
         border: #1abc9c;
         border: 2px solid #73AD21;
@@ -137,6 +169,17 @@
     .close-btn:hover {
         background-color: #f44336;
         color: #ffffff;
+    }
+
+    .results {
+        margin-top: 5%;
+        background: #1abc9c;
+        border-radius: 25px;
+        border: 2px solid #89e6d3;
+    }
+
+    ul {
+        list-style-type: none;
     }
 </style>
 
@@ -277,6 +320,7 @@
         const weatherData = JSON.stringify(weatherDataWithDate);
         const res = await this.fetchWeather(weatherData);
         this.setState({weatherResponses: res});
+        
   };
 
   handleGetWeatherExcel = async () => {
@@ -430,7 +474,9 @@
     }
 
     <div className="center">
+        <a href="#bottom">
         <button className="buttonstyle" onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
+        </a>
     </div>
 
     {this.state.loading === true &&
@@ -440,10 +486,17 @@
         }
 
     {this.state.weatherResponses.length > 0 &&
-            <div className="center">
-                <button onClick={() => this.handleGetWeatherExcel()}>Download Data</button>
-            </div>
-        }
+    <div className="results">
+    
+    <div className="center_no_space">
+        <h1 className="textforresults">Today's Forecast</h1>
+    </div>
+
+    <div className="center">
+        <button className="buttonstylewhite" onClick={() => this.toggleShowHistoricalData()}>Toggle Show Historical Data</button>
+
+        <button className="buttonstylewhite" onClick={() => this.toggleShowJSON()}>Toggle Show JSON</button>
+    </div>
 
     <div className="center">
         {this.state.weatherResponses && this.state.weatherResponses.map((weatherResponse) => (
@@ -472,7 +525,7 @@
                 <div>Pressure: {weatherResponse['currentWeather']['main']['pressure']}</div>
 
                 <br />
-                <button onClick={() => this.toggleShowHistoricalData()}>Toggle Show Historical Data</button>
+
                 {this.state.shouldShowHistoricalData  && weatherResponse['historical_data'].map((historical) => (
                     <div>
                     <b>{(new Date(historical['data'][0]['dt'] * 1000)).toLocaleDateString(undefined, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</b>
@@ -493,15 +546,23 @@
 
                 
 
-                <button onClick={() => this.toggleShowJSON()}>Toggle Show JSON</button>
+
                 {this.state.shouldShowJSON && 
-                    <div className="jsonblock">{JSON.stringify(weatherResponse)}</div>
+                    <code className="jsonblock">{JSON.stringify(weatherResponse)}</code>
                 }
 
 
             </div>
             ))}
     </div>
+    {this.state.weatherResponses.length > 0 &&
+            <div className="center">
+                <button className="buttonstylewhite" onClick={() => this.handleGetWeatherExcel()}>Download Data</button>
+            </div>
+        }
+    </div>
+    }
+    <div id="bottom"></div>
 
     
 </div>
