@@ -173,10 +173,10 @@
 
   fetchExcelWeather = async (weatherData) => {
         try {
-            // http://127.0.0.1:5000/weather?weatherData=${weatherData}
+            // http://127.0.0.1:5000/download?weatherData=${weatherData}
             // http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}
             const res = await fetch(
-                `http://127.0.0.1:5000/download?weatherData=${weatherData}`
+                `http://domgurnari.pythonanywhere.com/download?weatherData=${weatherData}`
             ).then(resp => resp.status === 200 ? resp.blob() : Promise.reject('something went wrong'))
             .then(blob => {
                 const url = window.URL.createObjectURL(blob);
@@ -184,7 +184,7 @@
                 a.style.display = 'none';
                 a.href = url;
                 // the filename you want
-                a.download = 'test.xlsx';
+                a.download = 'weatherdata.xlsx';
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
@@ -207,7 +207,7 @@
             // http://127.0.0.1:5000/weather?weatherData=${weatherData}
             // http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}
             const res = await fetch(
-                `http://127.0.0.1:5000/weather?weatherData=${weatherData}`
+                `http://domgurnari.pythonanywhere.com/weather?weatherData=${weatherData}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();
@@ -221,7 +221,7 @@
             // http://127.0.0.1:5000/places?city=${text}
             // http://domgurnari.pythonanywhere.com/places?city=${text}
             const res = await fetch(
-                `http://127.0.0.1:5000/places?city=${text}`
+                `http://domgurnari.pythonanywhere.com/places?city=${text}`
             );
             if (!res.ok) throw new Error(res.statusText);
             return res.json();

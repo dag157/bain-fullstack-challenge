@@ -127,7 +127,8 @@ def excel():
 
 
     header = ['place_name', 'currentWeather', 'longitude', 'latitude', 'place_id', 'historical_data']
-    with open('weatherdata.xlsx', 'w') as output:
+    path = os.getcwd()
+    with open(f'{path}/weatherdata.xlsx', 'w') as output:
         w = csv.DictWriter(output, header)
         w.writeheader()
         for weather_stats in weather_stats_to_return:
@@ -136,7 +137,7 @@ def excel():
     print('sending file')
     path = os.getcwd()
     print(path)
-    result = send_file(f'{path}/test.xlsx', attachment_filename="test.xlsx", as_attachment=True)
+    result = send_file(f'{path}/weatherdata.xlsx', attachment_filename="test.xlsx", as_attachment=True)
 
     print('deleting file')
     return result
