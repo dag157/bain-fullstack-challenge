@@ -20,6 +20,15 @@
 
 
 <style>
+
+    .header {
+        padding: 30px;
+        text-align: center;
+        background: #1abc9c;
+        color: white;
+        font-size: 30px;
+    }
+
     .center {
         display: flex;
         align-items: center;
@@ -54,6 +63,55 @@
         border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box;
+    }
+
+    .calendar {
+        width: 150px;
+        min-width: 150px;
+        max-width: 150px;
+        padding: 12px 20px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: block;
+    }
+
+    .newline {
+        white-space: pre-line;
+    }
+
+    .center_no_space {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .buttonstyle {
+        background-color: #1abc9c;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+
+    .close-btn {
+        font-weight: bold;
+        font-size: 30px;
+        color: #f44336;
+        border: none;
+        background: none;
+        padding: 3;
+    }
+
+    .close-btn:hover {
+        background-color: #f44336;
+        color: #ffffff;
     }
 </style>
 
@@ -246,10 +304,13 @@
         return (
         <div>
     <form action="{{ url_for('weather') }}" method="post" name="regform" id="regform">
-      <div className="center">
+            <div class="header">
+                <h1>Weatherly</h1>
+                <p>Get Weather Data on the Fly</p>
+            
+    <div className="center_no_space">
         <div className="placesAutocomplete__inputWrap">
           <div className="center">
-            Enter a city (Example: Paris)
             </div>
           <label htmlFor="city" className="label">
             {this.state.autocompleteErr && (
@@ -267,6 +328,7 @@
             pattern={this.state.autocompleteCities.map((place) => place.description).join("|")}
             autoComplete="off"
             className="searchbox"
+            placeholder="Enter a location.."
           />
           <input
             list="places"
@@ -296,24 +358,26 @@
           </span>
         </div>
       </div>
+      <div className="center_no_space">
+    <div className="newline"></div>
+    <input onSelect={this.handleDateChange} type="text" id="datepicker" className="calendar" placeholder="From" />
+    <input onSelect={this.handleDateChange} type="text" id="datepickerend" className="calendar" placeholder="To" />
+    </div>
+    </div>
     </form>
 
     <ol className="centerlist">
         {this.state.selectedCities.map((city) => (
                 <li>
-               <div>{city.place}</div>
-               <button onClick={() => this.handleRemoveFromSelectedCities(city.place, city.place_id)}>Remove</button>
+               <div>{city.place}
+               <button className="close-btn" onClick={() => this.handleRemoveFromSelectedCities(city.place, city.place_id)}>&times;</button>
+            </div>
                </li>
             ))}
     </ol>
 
-
-    <div className="center">Get Historial Data</div>
-    <div className="center">Start Date: <input onSelect={this.handleDateChange} type="text" id="datepicker" /></div>
-    <div className="center">End Date: <input onSelect={this.handleDateChange} type="text" id="datepickerend" /></div>
-
     <div className="center">
-        <button onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
+        <button className="buttonstyle" onClick={() => this.handleGetWeather()}>Get Weather for Selected Places</button>
     </div>
 
     {this.state.weatherResponses.length > 0 &&
@@ -352,7 +416,7 @@
                 <button onClick={() => this.toggleShowHistoricalData()}>Toggle Show Historical Data</button>
                 {this.state.shouldShowHistoricalData  && weatherResponse['historical_data'].map((historical) => (
                     <div>
-                    <b>Date: {(new Date(historical['data'][0]['dt'] * 1000)).toLocaleDateString(undefined, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</b>
+                    <b>{(new Date(historical['data'][0]['dt'] * 1000)).toLocaleDateString(undefined, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</b>
                     <div>
                         <img 
                             src={`http://openweathermap.org/img/wn/${historical['data'][0]['weather'][0]['icon']}.png`}

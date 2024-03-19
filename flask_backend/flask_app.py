@@ -158,6 +158,7 @@ def compute_date_range(startTime, endTime):
         if counter < endTime:
             ranges.append(str(counter))
     
-    ranges.append(str(endTime))
+    if startTime != endTime:
+        ranges.append(str(endTime))
 
     return ranges
